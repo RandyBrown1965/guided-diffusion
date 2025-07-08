@@ -518,8 +518,10 @@ class GaussianDiffusion:
             from tqdm.auto import tqdm
 
             indices = tqdm(indices)
-
+        # This is the loop over the number of diffusion timesteps
         for i in indices:
+            if i % 50 == 0:
+                print("step spacing", i)
             t = th.tensor([i] * shape[0], device=device)
             with th.no_grad():
                 out = self.p_sample(

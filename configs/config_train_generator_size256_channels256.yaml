@@ -1,0 +1,19 @@
+model:
+    params:
+      data_dir: datasets/imagenet256_clean/
+      image_size: 256
+      num_channels: 128
+      attention_resolutions: '32,16,8'
+      num_res_blocks: 2
+      resblock_updown: True
+      learn_sigma: True
+      noise_schedule: linear
+      lr: 1e-4
+      batch_size: 2
+      save_interval: 2000 #default=10000
+      diffusion_steps: 4000
+      use_fp16: False
+      
+     
+      
+      

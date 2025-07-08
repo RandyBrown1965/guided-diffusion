@@ -10,6 +10,9 @@ import numpy as np
 import torch as th
 import torch.distributed as dist
 
+from torchvision.transforms.functional import to_pil_image
+from PIL import Image
+
 from guided_diffusion import dist_util, logger
 from guided_diffusion.script_util import (
     NUM_CLASSES,
@@ -26,6 +29,7 @@ def main():
     dist_util.setup_dist()
     logger.configure()
 
+    print("args=", args)
     logger.log("creating model and diffusion...")
     model, diffusion = create_model_and_diffusion(
         **args_to_dict(args, model_and_diffusion_defaults().keys())
@@ -33,6 +37,7 @@ def main():
     model.load_state_dict(
         dist_util.load_state_dict(args.model_path, map_location="cpu")
     )
+    logger.log("We are working on", dist_util.dev())
     model.to(dist_util.dev())
     if args.use_fp16:
         model.convert_to_fp16()
@@ -58,6 +63,13 @@ def main():
             model_kwargs=model_kwargs,
         )
         sample = ((sample + 1) * 127.5).clamp(0, 255).to(th.uint8)
+
+        
+        for i in range(len(sample)):
+            img = to_pil_image(sample[i, :, :, :])
+            img.show()
+            img.save(f"output/pic_{len(all_images)}_{i}.png")
+            logger.log(f"Saved to ./output/pic_{len(all_images)}_{i}.png")
         sample = sample.permute(0, 2, 3, 1)
         sample = sample.contiguous()
 
@@ -88,6 +100,7 @@ def main():
 
     dist.barrier()
     logger.log("sampling complete")
+    dist.destroy_process_group()
 
 
 def create_argparser():

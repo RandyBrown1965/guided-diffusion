@@ -8,6 +8,9 @@ import torch.distributed as dist
 from torch.nn.parallel.distributed import DistributedDataParallel as DDP
 from torch.optim import AdamW
 
+import torch.nn.functional as F
+from torchvision.transforms.functional import to_pil_image
+
 from . import dist_util, logger
 from .fp16_util import MixedPrecisionTrainer
 from .nn import update_ema
@@ -240,6 +243,7 @@ class TrainLoop:
                     filename = f"ema_{rate}_{(self.step+self.resume_step):06d}.pt"
                 with bf.BlobFile(bf.join(get_blob_logdir(), filename), "wb") as f:
                     th.save(state_dict, f)
+                    logger.log(f"Model saved as {f}")
 
         save_checkpoint(0, self.mp_trainer.master_params)
         for rate, params in zip(self.ema_rate, self.ema_params):
@@ -251,6 +255,7 @@ class TrainLoop:
                 "wb",
             ) as f:
                 th.save(self.opt.state_dict(), f)
+                logger.log(f"Saved as {f}")
 
         dist.barrier()
 
@@ -273,6 +278,7 @@ def parse_resume_step_from_filename(filename):
 def get_blob_logdir():
     # You can change this to be a separate path to save checkpoints to
     # a blobstore or some external drive.
+    print("LOG DIR IS", logger.get_dir())
     return logger.get_dir()
 
 

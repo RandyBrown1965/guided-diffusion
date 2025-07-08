@@ -2,6 +2,13 @@
 Train a diffusion model on images.
 """
 
+from clearml import Task
+task = Task.init(project_name='TP601375_DiffusionDenoiser', task_name='TP602603_ImageGeneratorTraining', output_uri='https://files.clearml.thefoundry.co.uk')
+task.upload_artifact('summaries', artifact_object='../clearml_summary') # Access to summary folder or .zip file
+#task.connect_configuration('../configs/config_train_generatore_size256_channels256.yaml')
+task.set_packages('requirements.txt')
+
+
 import argparse
 
 from guided_diffusion import dist_util, logger
@@ -14,10 +21,12 @@ from guided_diffusion.script_util import (
     add_dict_to_argparser,
 )
 from guided_diffusion.train_util import TrainLoop
+import torch.distributed as dist
 
 
 def main():
     args = create_argparser().parse_args()
+    print("ARGS=", args)
 
     dist_util.setup_dist()
     logger.configure()
@@ -55,7 +64,7 @@ def main():
         weight_decay=args.weight_decay,
         lr_anneal_steps=args.lr_anneal_steps,
     ).run_loop()
-
+    dist.destroy_process_group()
 
 def create_argparser():
     defaults = dict(
