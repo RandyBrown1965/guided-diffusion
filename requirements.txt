@@ -2,7 +2,7 @@ attrs
 blobfile
 certifi
 charset-normalizer
-clearml
+clearml>=1.0.0
 filelock
 fsspec
 furl
