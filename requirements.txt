@@ -2,7 +2,7 @@ attrs
 blobfile
 certifi
 charset-normalizer
-clearml==2.0.1
+clearml
 filelock
 fsspec
 furl
@@ -46,7 +46,7 @@ rpds-py
 setuptools
 six
 sympy
-torch==2.7.1
+torch
 torchvision
 tqdm
 triton
