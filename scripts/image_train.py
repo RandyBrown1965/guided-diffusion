@@ -2,12 +2,16 @@
 Train a diffusion model on images.
 """
 
-from clearml import Task
+from clearml import Task, Dataset
 task = Task.init(project_name='TP601375_DiffusionDenoiser', task_name='TP602603_ImageGeneratorTraining', output_uri='https://files.clearml.thefoundry.co.uk')
 task.upload_artifact('summaries', artifact_object='../clearml_summary') # Access to summary folder or .zip file
 #task.connect_configuration('../configs/config_train_generatore_size256_channels256.yaml')
 task.set_container(docker='mfisherman/openmpi:latest') 
 task.set_packages('requirements.txt')
+
+dataset = Dataset.get(dataset_name = "Imagenet256_clean_for_TP602603")
+dataset_path = dataset.get_local_copy()
+dataset_meta = dataset.get_metadata()
 
 
 import argparse
@@ -39,6 +43,8 @@ def main():
     model.to(dist_util.dev())
     schedule_sampler = create_named_schedule_sampler(args.schedule_sampler, diffusion)
 
+    
+    # This is not needed if we use the copy of the dataset pre-loaded to clearml
     logger.log("creating data loader...")
     data = load_data(
         data_dir=args.data_dir,
@@ -46,12 +52,14 @@ def main():
         image_size=args.image_size,
         class_cond=args.class_cond,
     )
+    
 
     logger.log("training...")
     TrainLoop(
         model=model,
         diffusion=diffusion,
-        data=data,
+        data=data, # data generator from directory in local repo
+        #data=dataset, # copy of training data on clearml
         batch_size=args.batch_size,
         microbatch=args.microbatch,
         lr=args.lr,
