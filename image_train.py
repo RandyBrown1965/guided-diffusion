@@ -7,6 +7,7 @@ task = Task.init(project_name='TP601375_DiffusionDenoiser', task_name='TP602603_
 task.upload_artifact('summaries', artifact_object='./clearml_summary') # Access to summary folder or .zip file
 #task.connect_configuration('./configs/config_train_generatore_size256_channels256.yaml')
 task.set_packages('requirements.txt')
+task.set_container(docker=-'nvidia/cuda:12.2.2-cudnn8-runtime-rockylinux9')
 
 
 import argparse
