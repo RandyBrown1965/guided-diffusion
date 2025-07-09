@@ -6,6 +6,7 @@ from clearml import Task
 task = Task.init(project_name='TP601375_DiffusionDenoiser', task_name='TP602603_ImageGeneratorTraining', output_uri='https://files.clearml.thefoundry.co.uk')
 task.upload_artifact('summaries', artifact_object='../clearml_summary') # Access to summary folder or .zip file
 #task.connect_configuration('../configs/config_train_generatore_size256_channels256.yaml')
+task.set_container(docker='mfisherman/openmpi:latest') 
 task.set_packages('requirements.txt')
 
 
