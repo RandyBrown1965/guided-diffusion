@@ -161,6 +161,7 @@ class TrainLoop:
             batch, cond = next(self.data)
             self.run_step(batch, cond)
             if self.step % self.log_interval == 0:
+                logger.log("Step=", self.step)
                 logger.dumpkvs()
             if self.step % self.save_interval == 0:
                 self.save()
@@ -278,7 +279,7 @@ def parse_resume_step_from_filename(filename):
 def get_blob_logdir():
     # You can change this to be a separate path to save checkpoints to
     # a blobstore or some external drive.
-    print("LOG DIR IS", logger.get_dir())
+    logger.log("LOG DIR IS", logger.get_dir())
     return logger.get_dir()
 
 
