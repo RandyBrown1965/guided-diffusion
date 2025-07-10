@@ -46,8 +46,8 @@ rpds-py
 setuptools
 six
 sympy
-torch
-torchvision
+torch==2.4.1+cu124
+torchvision==0.19.1+cu124
 tqdm
 triton
 typing_extensions

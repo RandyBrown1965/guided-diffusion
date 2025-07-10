@@ -2,7 +2,7 @@
 Train a diffusion model on images.
 """
 
-from clearml import Task
+from clearml import Task, Dataset
 task = Task.init(project_name='TP601375_DiffusionDenoiser', task_name='TP602603_ImageGeneratorTraining', output_uri='https://files.clearml.thefoundry.co.uk')
 task.upload_artifact('summaries', artifact_object='./clearml_summary') # Access to summary folder or .zip file
 #task.connect_configuration('./configs/config_train_generatore_size256_channels256.yaml')
@@ -40,8 +40,13 @@ def main():
     schedule_sampler = create_named_schedule_sampler(args.schedule_sampler, diffusion)
 
     logger.log("creating data loader...")
+    dataset = Dataset.get(dataset_name = "Imagenet256_clean_for_TP602603")
+    dataset_path = dataset.get_local_copy()
+    dataset_meta = dataset.get_metadata()
+
     data = load_data(
-        data_dir=args.data_dir,
+        #data_dir=args.data_dir,
+        data_dir = dataset_path,
         batch_size=args.batch_size,
         image_size=args.image_size,
         class_cond=args.class_cond,
